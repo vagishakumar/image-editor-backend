@@ -1,7 +1,9 @@
 const FormData = require("form-data");
 const axios = require("axios");
 
-async function uploadImageToImgbb(fileBuffer, apiKey) {
+const apiKey = "0e2f12d36919f68ec1c3473677d19ee9";
+
+async function uploadImageToImgbb(fileBuffer) {
   try {
     // Ensure req.file exists
     if (!fileBuffer) {

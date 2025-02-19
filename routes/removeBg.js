@@ -10,8 +10,6 @@ myHeaders.append("api_token", "99712e743d394fe792889d2b0bae2a12");
 
 const axios = require("axios");
 
-const apiKey = "0e2f12d36919f68ec1c3473677d19ee9";
-
 async function downloadImage(url) {
   try {
     // Fetch the image as an array buffer so we can convert it to a Buffer
@@ -25,7 +23,7 @@ async function downloadImage(url) {
 
 async function uploadNoBgImg(url) {
   const buffer = await downloadImage(url);
-  const imageUrl = await uploadImageToImgbb(buffer, apiKey);
+  const imageUrl = await uploadImageToImgbb(buffer);
   return imageUrl;
 }
 
@@ -34,26 +32,33 @@ async function uploadNoBgImg(url) {
 //   .then((result) => console.log(result))
 //   .catch((error) => console.error(error));
 
-router.post("/removebg", upload.single("image"), async (req, res) => {
-  console.log("req.file", req.file);
-
+router.post("/upload", upload.single("image"), async (req, res) => {
   if (!req.file.buffer) {
     console.log("no buffer");
     return;
   }
+  const imageUrl = await uploadImageToImgbb(req.file.buffer);
+  res.send({ imageUrl });
+});
 
-  const imageUrl = await uploadImageToImgbb(req.file.buffer, apiKey);
+router.post("/removebg", async (req, res) => {
+  console.log("req.body", req.body);
+  if (!req.body.imageUrl) {
+    console.log("no image");
+    res.send({ message: "no image" });
+    return;
+  }
+
+  // const imageUrl = await uploadImageToImgbb(req.file.buffer);
+
+  const imageUrl = req.body.imageUrl;
 
   console.log("imageUrl", imageUrl);
-
-  //   res.json({ message: "Image processed successfully", imageUrl });
-
-  //   uploadImage();
 
   const formdata = new FormData();
   formdata.append(
     "image_url",
-    `${imageUrl}`
+    imageUrl
     // "https://awsstage-test-ap-south-1.s3.ap-south-1.amazonaws.com/114972/932262e3-7a74-4dd8-9b98-fd83fda98b8c.jpeg"
   );
 
@@ -70,9 +75,6 @@ router.post("/removebg", upload.single("image"), async (req, res) => {
   );
 
   const data = await resp.json();
-  //   .then((response) => response.text())
-  //   .then((result) => console.log(result))
-  //   .catch((error) => console.error(error));
 
   console.log("resp", data);
 

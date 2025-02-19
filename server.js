@@ -17,6 +17,7 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 app.use("/api/ai", aiRoutes);
+app.use(express.urlencoded({ extended: true }));
 
 // API endpoint for image processing (example: resize)
 app.post("/api/resize", upload.single("image"), async (req, res) => {
