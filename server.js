@@ -4,7 +4,8 @@ const cors = require("cors");
 const multer = require("multer");
 const sharp = require("sharp");
 const path = require("path");
-const aiRoutes = require("./routes/removeBg");
+const { router: aiRoutes } = require("./routes/removeBg");
+const areaEraser = require("./routes/areaEraser");
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -16,8 +17,10 @@ app.use(express.json());
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-app.use("/api/ai", aiRoutes);
 app.use(express.urlencoded({ extended: true }));
+
+app.use("/api/ai", aiRoutes);
+app.use("/api/ai", areaEraser);
 
 // API endpoint for image processing (example: resize)
 app.post("/api/resize", upload.single("image"), async (req, res) => {

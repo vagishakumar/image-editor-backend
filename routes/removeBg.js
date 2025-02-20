@@ -21,7 +21,7 @@ async function downloadImage(url) {
   }
 }
 
-async function uploadNoBgImg(url) {
+async function uploadResponseImg(url) {
   const buffer = await downloadImage(url);
   const imageUrl = await uploadImageToImgbb(buffer);
   return imageUrl;
@@ -41,7 +41,7 @@ router.post("/upload", upload.single("image"), async (req, res) => {
   res.send({ imageUrl });
 });
 
-router.post("/removebg", async (req, res) => {
+router.post("/removebg", upload.none(), async (req, res) => {
   console.log("req.body", req.body);
   if (!req.body.imageUrl) {
     console.log("no image");
@@ -83,7 +83,7 @@ router.post("/removebg", async (req, res) => {
     return;
   }
 
-  const resultUrl = await uploadNoBgImg(data.result_url);
+  const resultUrl = await uploadResponseImg(data.result_url);
 
   res.send({ data, resultUrl });
   //   res.send({
@@ -91,4 +91,7 @@ router.post("/removebg", async (req, res) => {
   //   });
 });
 
-module.exports = router;
+module.exports = {
+  router,
+  uploadResponseImg,
+};
