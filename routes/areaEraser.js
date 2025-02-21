@@ -1,9 +1,13 @@
 const express = require("express");
 const multer = require("multer");
 const router = express.Router();
-const uploadResponseImg = require("./removeBg");
+const { uploadResponseImg } = require("./removeBg");
+
+// const myHeaders = new Headers();
+// myHeaders.append("api_token", "99712e743d394fe792889d2b0bae2a12");
 
 const myHeaders = new Headers();
+myHeaders.append("Content-Type", "application/json");
 myHeaders.append("api_token", "99712e743d394fe792889d2b0bae2a12");
 
 const upload = multer({ storage: multer.memoryStorage() });
@@ -23,17 +27,15 @@ router.post("/eraser", upload.none(), async (req, res) => {
   console.log("imageUrl", imageUrl);
   console.log("maskUrl", maskUrl);
 
-  const formdata = new FormData();
-  formdata.append("mask_url", maskUrl);
-  formdata.append("image_url", imageUrl);
+  const raw = JSON.stringify({
+    image_url: imageUrl,
+    mask_url: maskUrl,
+  });
 
   const requestOptions = {
     method: "POST",
     headers: myHeaders,
-    body: JSON.stringify({
-      mask_url: maskUrl,
-      image_url: imageUrl,
-    }),
+    body: raw,
     redirect: "follow",
   };
 
