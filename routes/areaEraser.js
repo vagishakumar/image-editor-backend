@@ -1,6 +1,7 @@
 const express = require("express");
 const multer = require("multer");
 const router = express.Router();
+const Bluebird = require("bluebird");
 const { uploadResponseImg } = require("./removeBg");
 
 // const myHeaders = new Headers();
@@ -56,6 +57,57 @@ router.post("/eraser", upload.none(), async (req, res) => {
   const resultUrl = await uploadResponseImg(data.result_url);
 
   res.send({ data, resultUrl });
+});
+
+router.post("/generator", upload.none(), async (req, res) => {
+  console.log("req.body", req.body);
+
+  const prompt = (req.body && req.body.prompt) || "";
+
+  if (!prompt) {
+    console.log("no prompt");
+    res.send({ message: "no prompt" });
+    return;
+  }
+
+  console.log("prompt", prompt);
+
+  const raw = JSON.stringify({
+    prompt: prompt,
+    num_results: 1,
+    sync: true,
+  });
+
+  const requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    body: raw,
+    redirect: "follow",
+  };
+
+  const resp = await fetch(
+    "https://engine.prod.bria-api.com/v1/text-to-image/base/2.3",
+    requestOptions
+  );
+
+  const data = await resp.json();
+
+  console.log("resp", data);
+
+  const result = data.result[0];
+  const { urls } = result;
+
+  if (!(Array.isArray(urls) && urls.length)) {
+    res.send({ data });
+    return;
+  }
+
+  const resultUrls = await Bluebird.map(urls, async (url) => {
+    return uploadResponseImg(url);
+  });
+
+  console.log("resultUrls", resultUrls);
+  res.send({ data, resultUrl: resultUrls[0], resultUrls });
 });
 
 module.exports = router;
