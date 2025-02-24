@@ -110,4 +110,66 @@ router.post("/generator", upload.none(), async (req, res) => {
   res.send({ data, resultUrl: resultUrls[0], resultUrls });
 });
 
+router.post("/modifier", upload.none(), async (req, res) => {
+  console.log("req.body", req.body);
+
+  const prompt = (req.body && req.body.prompt) || "";
+  const imageUrl = (req.body && req.body.imageUrl) || "";
+  const maskUrl = (req.body && req.body.maskUrl) || "";
+
+  if (!prompt) {
+    console.log("no prompt");
+    res.send({ message: "no prompt" });
+    return;
+  }
+
+  if (!imageUrl || !maskUrl) {
+    console.log("no image");
+    res.send({ message: "no image" });
+    return;
+  }
+
+  const raw = JSON.stringify({
+    image_url: imageUrl,
+    mask_url: maskUrl,
+    mask_type: "automatic",
+    prompt: prompt,
+    negative_prompt: "",
+    num_results: 1,
+    sync: true,
+    seed: 0,
+    content_moderation: false,
+  });
+
+  const requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    body: raw,
+    redirect: "follow",
+  };
+
+  const resp = await fetch(
+    "https://engine.prod.bria-api.com/v1/gen_fill",
+    requestOptions
+  );
+
+  const data = await resp.json();
+
+  console.log("resp", data);
+
+  const { urls } = data;
+
+  if (!(Array.isArray(urls) && urls.length)) {
+    res.send({ data });
+    return;
+  }
+
+  const resultUrls = await Bluebird.map(urls, async (url) => {
+    return uploadResponseImg(url);
+  });
+
+  //   console.log("resultUrls", resultUrls);
+  res.send({ data, resultUrl: resultUrls[0], resultUrls });
+});
+
 module.exports = router;
