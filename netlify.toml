@@ -1,0 +1,12 @@
+[build]
+  command = "yarn install"
+  functions = "server"
+  publish = "."
+
+[functions]
+  node_bundler = "esbuild"
+
+[[redirects]]
+  from = "/*"
+  to = "/.netlify/functions/server"
+  status = 200

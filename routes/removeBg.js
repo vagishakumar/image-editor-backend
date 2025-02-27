@@ -1,7 +1,8 @@
 const express = require("express");
 const multer = require("multer");
 const router = express.Router();
-const uploadImageToImgbb = require("../helpers/uploadImage");
+const uploadImageToImgbb = require("../helpers/uploadImageCloudinary");
+// const uploadImageToImgbb = require("../helpers/uploadImage");
 
 const upload = multer({ storage: multer.memoryStorage() });
 
