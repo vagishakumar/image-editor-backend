@@ -34,6 +34,10 @@ app.post("/api/resize", upload.single("image"), async (req, res) => {
   }
 });
 
+app.get("/", (req, res) => {
+  res.send("Welcome to the Image Editing AI Backend 🚀");
+});
+
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
