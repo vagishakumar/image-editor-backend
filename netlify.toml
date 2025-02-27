@@ -1,7 +1,6 @@
 [build]
   command = "yarn install"
-  functions = "server"
-  publish = "."
+  functions = "functions"
 
 [functions]
   node_bundler = "esbuild"

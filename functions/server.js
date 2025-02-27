@@ -3,8 +3,8 @@ const serverless = require("serverless-http");
 const cors = require("cors");
 const multer = require("multer");
 const sharp = require("sharp");
-const { router: aiRoutes } = require("./routes/removeBg");
-const areaEraser = require("./routes/areaEraser");
+const { router: aiRoutes } = require("../routes/removeBg");
+const areaEraser = require("../routes/areaEraser");
 
 const app = express();
 const port = process.env.PORT || 5000;
