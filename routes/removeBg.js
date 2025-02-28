@@ -24,7 +24,8 @@ async function downloadImage(url) {
 
 async function uploadResponseImg(url) {
   const buffer = await downloadImage(url);
-  const imageUrl = await uploadImageToCloud(buffer);
+  const imageUrl = await uploadImageToImgbb(buffer);
+  // const imageUrl = await uploadImageToCloud(buffer);
   return imageUrl;
 }
 
@@ -115,7 +116,7 @@ router.post("/increaseResolution", upload.none(), async (req, res) => {
     return;
   }
 
-  const resultUrl = await uploadImageToImgbb(data.result_url);
+  const resultUrl = await uploadResponseImg(data.result_url);
 
   res.send({ data, resultUrl });
 });
