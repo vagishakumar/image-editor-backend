@@ -4,7 +4,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "netlify dev",
+    "start": "node functions/server.js",
+    "dev": "nodemon functions/server.js",
     "build": "echo 'No build needed'"
   },
   "keywords": [],

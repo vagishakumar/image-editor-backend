@@ -172,4 +172,62 @@ router.post("/modifier", upload.none(), async (req, res) => {
   res.send({ data, resultUrl: resultUrls[0], resultUrls });
 });
 
+router.post("/backgroundGen", upload.none(), async (req, res) => {
+  const prompt = (req.body && req.body.prompt) || "";
+  const imageUrl = (req.body && req.body.imageUrl) || "";
+
+  if (!prompt) {
+    console.log("no prompt");
+    res.send({ message: "no prompt" });
+    return;
+  }
+
+  if (!imageUrl) {
+    console.log("no image");
+    res.send({ message: "no image" });
+    return;
+  }
+
+  const raw = JSON.stringify({
+    bg_prompt: prompt,
+    num_results: 1,
+    sync: true,
+    image_url: imageUrl,
+  });
+
+  const requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    body: raw,
+    redirect: "follow",
+  };
+
+  const resp = await fetch(
+    "https://engine.prod.bria-api.com/v1/background/replace",
+    requestOptions
+  );
+
+  const data = await resp.json();
+
+  console.log("resp", data);
+
+  const { result } = data;
+
+  if (!(Array.isArray(result) && result.length)) {
+    res.send({ data });
+    return;
+  }
+
+  console.log("result", result[0]);
+  const urls = result[0];
+
+  const resultUrls = await Bluebird.map(result, async (item) => {
+    const url = item[0];
+    return uploadResponseImg(url);
+  });
+
+  //   console.log("resultUrls", resultUrls);
+  res.send({ data, resultUrl: resultUrls[0], resultUrls });
+});
+
 module.exports = router;
