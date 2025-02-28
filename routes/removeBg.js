@@ -1,8 +1,8 @@
 const express = require("express");
 const multer = require("multer");
 const router = express.Router();
-const uploadImageToImgbb = require("../helpers/uploadImageCloudinary");
-// const uploadImageToImgbb = require("../helpers/uploadImage");
+const uploadImageToCloud = require("../helpers/uploadImageCloudinary");
+const uploadImageToImgbb = require("../helpers/uploadImage");
 
 const upload = multer({ storage: multer.memoryStorage() });
 
@@ -24,7 +24,7 @@ async function downloadImage(url) {
 
 async function uploadResponseImg(url) {
   const buffer = await downloadImage(url);
-  const imageUrl = await uploadImageToImgbb(buffer);
+  const imageUrl = await uploadImageToCloud(buffer);
   return imageUrl;
 }
 
@@ -38,7 +38,7 @@ router.post("/upload", upload.single("image"), async (req, res) => {
     console.log("no buffer");
     return;
   }
-  const imageUrl = await uploadImageToImgbb(req.file.buffer);
+  const imageUrl = await uploadImageToCloud(req.file.buffer);
   res.send({ imageUrl });
 });
 
@@ -50,7 +50,7 @@ router.post("/removebg", upload.none(), async (req, res) => {
     return;
   }
 
-  // const imageUrl = await uploadImageToImgbb(req.file.buffer);
+  // const imageUrl = await uploadImageToCloud(req.file.buffer);
 
   const imageUrl = req.body.imageUrl;
 
@@ -129,7 +129,7 @@ router.post("/increaseResolution", upload.none(), async (req, res) => {
     return;
   }
 
-  const resultUrl = await uploadResponseImg(data.result_url);
+  const resultUrl = await uploadImageToImgbb(data.result_url);
 
   res.send({ data, resultUrl });
 });
@@ -142,7 +142,7 @@ router.post("/removeForeground", upload.none(), async (req, res) => {
     return;
   }
 
-  // const imageUrl = await uploadImageToImgbb(req.file.buffer);
+  // const imageUrl = await uploadImageToCloud(req.file.buffer);
 
   const imageUrl = req.body.imageUrl;
 
