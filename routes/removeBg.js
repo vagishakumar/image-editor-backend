@@ -25,6 +25,7 @@ async function downloadImage(url) {
 async function uploadResponseImg(url) {
   const buffer = await downloadImage(url);
   const imageUrl = await uploadImageToImgbb(buffer);
+  // const imageUrl = await uploadImageToCloud(buffer);
   return imageUrl;
 }
 
