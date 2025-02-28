@@ -1,7 +1,6 @@
 const FormData = require("form-data");
 const axios = require("axios");
 
-// const apiKey = "0e2f12d36919f68ec1c3473677d19ee9";
 const apiKey = process.env.IMG_BB_API_KEY || "";
 
 async function uploadImageToImgbb(fileBuffer) {
