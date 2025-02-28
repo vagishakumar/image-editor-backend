@@ -7,7 +7,7 @@ const uploadImageToImgbb = require("../helpers/uploadImage");
 const upload = multer({ storage: multer.memoryStorage() });
 
 const myHeaders = new Headers();
-myHeaders.append("api_token", "99712e743d394fe792889d2b0bae2a12");
+myHeaders.append("api_token", process.env.BRIA_API_TOKEN);
 
 const axios = require("axios");
 
@@ -28,11 +28,6 @@ async function uploadResponseImg(url) {
   return imageUrl;
 }
 
-// fetch("https://engine.prod.bria-api.com/v1/background/remove", requestOptions)
-//   .then((response) => response.text())
-//   .then((result) => console.log(result))
-//   .catch((error) => console.error(error));
-
 router.post("/upload", upload.single("image"), async (req, res) => {
   if (!req.file.buffer) {
     console.log("no buffer");
@@ -50,18 +45,12 @@ router.post("/removebg", upload.none(), async (req, res) => {
     return;
   }
 
-  // const imageUrl = await uploadImageToCloud(req.file.buffer);
-
   const imageUrl = req.body.imageUrl;
 
   console.log("imageUrl", imageUrl);
 
   const formdata = new FormData();
-  formdata.append(
-    "image_url",
-    imageUrl
-    // "https://awsstage-test-ap-south-1.s3.ap-south-1.amazonaws.com/114972/932262e3-7a74-4dd8-9b98-fd83fda98b8c.jpeg"
-  );
+  formdata.append("image_url", imageUrl);
 
   const requestOptions = {
     method: "POST",
@@ -87,9 +76,6 @@ router.post("/removebg", upload.none(), async (req, res) => {
   const resultUrl = await uploadResponseImg(data.result_url);
 
   res.send({ data, resultUrl });
-  //   res.send({
-  //     message: "ok",
-  //   });
 });
 
 router.post("/increaseResolution", upload.none(), async (req, res) => {
@@ -135,25 +121,12 @@ router.post("/increaseResolution", upload.none(), async (req, res) => {
 });
 
 router.post("/removeForeground", upload.none(), async (req, res) => {
-  console.log("req.body", req.body);
   if (!req.body.imageUrl) {
-    console.log("no image");
     res.send({ message: "no image" });
     return;
   }
 
-  // const imageUrl = await uploadImageToCloud(req.file.buffer);
-
   const imageUrl = req.body.imageUrl;
-
-  console.log("imageUrl", imageUrl);
-
-  // const formdata = new FormData();
-  // formdata.append(
-  //   "image_url",
-  //   imageUrl
-  //   // "https://awsstage-test-ap-south-1.s3.ap-south-1.amazonaws.com/114972/932262e3-7a74-4dd8-9b98-fd83fda98b8c.jpeg"
-  // );
 
   const raw = JSON.stringify({ image_url: imageUrl });
 
@@ -171,25 +144,17 @@ router.post("/removeForeground", upload.none(), async (req, res) => {
 
   const data = await resp.json();
 
-  console.log("resp", data);
-
   if (!data.result_url) {
     res.send({ data });
     return;
   }
 
   const resultUrl = await uploadResponseImg(data.result_url);
-
   res.send({ data, resultUrl });
-  //   res.send({
-  //     message: "ok",
-  //   });
 });
 
 router.post("/blurBg", upload.none(), async (req, res) => {
-  console.log("req.body", req.body);
   if (!req.body.imageUrl) {
-    console.log("no image");
     res.send({ message: "no image" });
     return;
   }
@@ -210,8 +175,6 @@ router.post("/blurBg", upload.none(), async (req, res) => {
   );
 
   const data = await resp.json();
-
-  console.log("resp", data);
 
   if (!data.result_url) {
     res.send({ data });

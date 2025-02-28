@@ -4,29 +4,20 @@ const router = express.Router();
 const Bluebird = require("bluebird");
 const { uploadResponseImg } = require("./removeBg");
 
-// const myHeaders = new Headers();
-// myHeaders.append("api_token", "99712e743d394fe792889d2b0bae2a12");
-
 const myHeaders = new Headers();
 myHeaders.append("Content-Type", "application/json");
-myHeaders.append("api_token", "99712e743d394fe792889d2b0bae2a12");
+myHeaders.append("api_token", process.env.BRIA_API_TOKEN);
 
 const upload = multer({ storage: multer.memoryStorage() });
 
 router.post("/eraser", upload.none(), async (req, res) => {
-  console.log("req.body", req.body);
-
   const imageUrl = (req.body && req.body.imageUrl) || "";
   const maskUrl = (req.body && req.body.maskUrl) || "";
 
   if (!imageUrl || !maskUrl) {
-    console.log("no image");
     res.send({ message: "no image" });
     return;
   }
-
-  console.log("imageUrl", imageUrl);
-  console.log("maskUrl", maskUrl);
 
   const raw = JSON.stringify({
     image_url: imageUrl,
@@ -47,8 +38,6 @@ router.post("/eraser", upload.none(), async (req, res) => {
 
   const data = await resp.json();
 
-  console.log("resp", data);
-
   if (!data.result_url) {
     res.send({ data });
     return;
@@ -60,17 +49,12 @@ router.post("/eraser", upload.none(), async (req, res) => {
 });
 
 router.post("/generator", upload.none(), async (req, res) => {
-  console.log("req.body", req.body);
-
   const prompt = (req.body && req.body.prompt) || "";
 
   if (!prompt) {
-    console.log("no prompt");
     res.send({ message: "no prompt" });
     return;
   }
-
-  console.log("prompt", prompt);
 
   const raw = JSON.stringify({
     prompt: prompt,
@@ -92,8 +76,6 @@ router.post("/generator", upload.none(), async (req, res) => {
 
   const data = await resp.json();
 
-  console.log("resp", data);
-
   const result = data.result[0];
   const { urls } = result;
 
@@ -106,25 +88,20 @@ router.post("/generator", upload.none(), async (req, res) => {
     return uploadResponseImg(url);
   });
 
-  console.log("resultUrls", resultUrls);
   res.send({ data, resultUrl: resultUrls[0], resultUrls });
 });
 
 router.post("/modifier", upload.none(), async (req, res) => {
-  console.log("req.body", req.body);
-
   const prompt = (req.body && req.body.prompt) || "";
   const imageUrl = (req.body && req.body.imageUrl) || "";
   const maskUrl = (req.body && req.body.maskUrl) || "";
 
   if (!prompt) {
-    console.log("no prompt");
     res.send({ message: "no prompt" });
     return;
   }
 
   if (!imageUrl || !maskUrl) {
-    console.log("no image");
     res.send({ message: "no image" });
     return;
   }
@@ -154,8 +131,6 @@ router.post("/modifier", upload.none(), async (req, res) => {
   );
 
   const data = await resp.json();
-
-  console.log("resp", data);
 
   const { urls } = data;
 
@@ -208,9 +183,6 @@ router.post("/backgroundGen", upload.none(), async (req, res) => {
   );
 
   const data = await resp.json();
-
-  console.log("resp", data);
-
   const { result } = data;
 
   if (!(Array.isArray(result) && result.length)) {
@@ -218,7 +190,6 @@ router.post("/backgroundGen", upload.none(), async (req, res) => {
     return;
   }
 
-  console.log("result", result[0]);
   const urls = result[0];
 
   const resultUrls = await Bluebird.map(result, async (item) => {
