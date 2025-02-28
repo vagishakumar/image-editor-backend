@@ -92,6 +92,137 @@ router.post("/removebg", upload.none(), async (req, res) => {
   //   });
 });
 
+router.post("/increaseResolution", upload.none(), async (req, res) => {
+  console.log("req.body", req.body);
+  if (!req.body.imageUrl) {
+    console.log("no image");
+    res.send({ message: "no image" });
+    return;
+  }
+
+  const query = new URLSearchParams({ desired_increase: "2" }).toString();
+  const imageUrl = req.body.imageUrl;
+
+  console.log("imageUrl", imageUrl);
+
+  const formdata = new FormData();
+  formdata.append("image_url", imageUrl);
+
+  const requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    body: formdata,
+    redirect: "follow",
+  };
+
+  const resp = await fetch(
+    `https://engine.prod.bria-api.com/v1/image/increase_resolution?${query}`,
+    requestOptions
+  );
+
+  const data = await resp.json();
+
+  console.log("resp", data);
+
+  if (!data.result_url) {
+    res.send({ data });
+    return;
+  }
+
+  const resultUrl = await uploadResponseImg(data.result_url);
+
+  res.send({ data, resultUrl });
+});
+
+router.post("/removeForeground", upload.none(), async (req, res) => {
+  console.log("req.body", req.body);
+  if (!req.body.imageUrl) {
+    console.log("no image");
+    res.send({ message: "no image" });
+    return;
+  }
+
+  // const imageUrl = await uploadImageToImgbb(req.file.buffer);
+
+  const imageUrl = req.body.imageUrl;
+
+  console.log("imageUrl", imageUrl);
+
+  // const formdata = new FormData();
+  // formdata.append(
+  //   "image_url",
+  //   imageUrl
+  //   // "https://awsstage-test-ap-south-1.s3.ap-south-1.amazonaws.com/114972/932262e3-7a74-4dd8-9b98-fd83fda98b8c.jpeg"
+  // );
+
+  const raw = JSON.stringify({ image_url: imageUrl });
+
+  const requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    body: raw,
+    redirect: "follow",
+  };
+
+  const resp = await fetch(
+    "https://engine.prod.bria-api.com/v1/erase_foreground",
+    requestOptions
+  );
+
+  const data = await resp.json();
+
+  console.log("resp", data);
+
+  if (!data.result_url) {
+    res.send({ data });
+    return;
+  }
+
+  const resultUrl = await uploadResponseImg(data.result_url);
+
+  res.send({ data, resultUrl });
+  //   res.send({
+  //     message: "ok",
+  //   });
+});
+
+router.post("/blurBg", upload.none(), async (req, res) => {
+  console.log("req.body", req.body);
+  if (!req.body.imageUrl) {
+    console.log("no image");
+    res.send({ message: "no image" });
+    return;
+  }
+
+  const imageUrl = req.body.imageUrl;
+  const raw = JSON.stringify({ image_url: imageUrl });
+
+  const requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    body: raw,
+    redirect: "follow",
+  };
+
+  const resp = await fetch(
+    "https://engine.prod.bria-api.com/v1/background/blur",
+    requestOptions
+  );
+
+  const data = await resp.json();
+
+  console.log("resp", data);
+
+  if (!data.result_url) {
+    res.send({ data });
+    return;
+  }
+
+  const resultUrl = await uploadResponseImg(data.result_url);
+
+  res.send({ data, resultUrl });
+});
+
 module.exports = {
   router,
   uploadResponseImg,
