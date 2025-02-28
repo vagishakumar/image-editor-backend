@@ -15,6 +15,25 @@ app.use(express.json());
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
+const allowedOrigins = [
+  "http://localhost:3002",
+  "http://localhost:3000",
+  "https://image-editor-socialpilot.netlify.app",
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true, // Allow cookies and headers
+  })
+);
+
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/ai", aiRoutes);
