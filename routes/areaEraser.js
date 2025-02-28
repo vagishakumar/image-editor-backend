@@ -48,6 +48,50 @@ router.post("/eraser", upload.none(), async (req, res) => {
   res.send({ data, resultUrl });
 });
 
+router.post("/expand", upload.none(), async (req, res) => {
+  const imageUrl = (req.body && req.body.imageUrl) || "";
+
+  if (!imageUrl) {
+    res.send({ message: "no image" });
+    return;
+  }
+
+  const originalWidth = +(req.body && req.body.originalWidth) || 350;
+  const originalHeight = +(req.body && req.body.originalHeight) || 350;
+  const expectedWidth = +(req.body && req.body.expectedWidth) || 1200;
+  const expectedHeight = +(req.body && req.body.expectedHeight) || 674;
+
+  const raw = JSON.stringify({
+    image_url: imageUrl,
+    canvas_size: [expectedWidth, expectedHeight],
+    original_image_size: [originalWidth, originalHeight],
+    original_image_location: [301, -66],
+  });
+
+  const requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    body: raw,
+    redirect: "follow",
+  };
+
+  const resp = await fetch(
+    "https://engine.prod.bria-api.com/v1/image_expansion",
+    requestOptions
+  );
+
+  const data = await resp.json();
+
+  if (!data.result_url) {
+    res.send({ data });
+    return;
+  }
+
+  const resultUrl = await uploadResponseImg(data.result_url);
+
+  res.send({ data, resultUrl });
+});
+
 router.post("/generator", upload.none(), async (req, res) => {
   const prompt = (req.body && req.body.prompt) || "";
 
