@@ -34,7 +34,7 @@ router.post("/upload", upload.single("image"), async (req, res) => {
     console.log("no buffer");
     return;
   }
-  const imageUrl = await uploadImageToCloud(req.file.buffer);
+  const imageUrl = await uploadImageToImgbb(req.file.buffer);
   res.send({ imageUrl });
 });
 
