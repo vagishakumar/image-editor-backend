@@ -20,6 +20,7 @@ const allowedOrigins = [
   "http://localhost:3002",
   "http://localhost:3000",
   "https://image-editor-socialpilot.netlify.app",
+  "https://image-editor-stag-socialpilot.netlify.app",
 ];
 
 app.use(
